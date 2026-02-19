@@ -1,5 +1,12 @@
+/*make it fill the browser window */
 html, body {
     height: 100%;
     margin: 0;
     padding: 0;
+}
+
+/* make the map fill its container */
+#map {
+    height: 100%;
+    width: 100%;
 }
