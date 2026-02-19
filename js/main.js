@@ -59,12 +59,27 @@ function createPopupContent(properties) {
         return '<text x="' + x + '" y="' + (height - 5) + '" font-size="8" text-anchor="middle">' + yr + '</text>';
     }).join("");
 
+    //draw y-axis tick marks and labels for percentages
+    var yTickValues = [0, 25, 50, 75, 100];
+    var yGridLines = yTickValues.map(function (tick) {
+        var y = height - pad - (tick / 100) * (height - pad * 2);
+        return '<line x1="' + pad + '" y1="' + y + '" x2="' + (width - pad) + '" y2="' + y + '" stroke="#ddd" stroke-width="1"/>';
+    }).join("");
+
+    var yTicks = yTickValues.map(function (tick) {
+        var y = height - pad - (tick / 100) * (height - pad * 2);
+        return '<line x1="' + (pad - 4) + '" y1="' + y + '" x2="' + pad + '" y2="' + y + '" stroke="#777"/>' +
+            '<text x="' + (pad - 6) + '" y="' + (y + 3) + '" font-size="8" text-anchor="end">' + tick + '%</text>';
+    }).join("");
+
     //return popup title + chart markup
     return `
         <h3 style="margin:0 0 6px 0;">${country}</h3>
         <svg width="${width}" height="${height}" viewBox="0 0 ${width} ${height}">
+            ${yGridLines}
             <line x1="${pad}" y1="${height - pad}" x2="${width - pad}" y2="${height - pad}" stroke="#999"/>
             <line x1="${pad}" y1="${pad}" x2="${pad}" y2="${height - pad}" stroke="#999"/>
+            ${yTicks}
             <polyline fill="none" stroke="#ff7800" stroke-width="2" points="${points}"></polyline>
             ${circles}
             ${labels}
