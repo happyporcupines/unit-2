@@ -33,43 +33,48 @@ function createPopupContent(properties) {
     var values = keys.map(function (k) { return Number(properties[k]); });
     var years = keys.map(function (k) { return k.split("_")[1]; });
 
-    //chart size and inner padding
-    var width = 240, height = 120, pad = 20;
+    //chart size and inner plot margins
+    var width = 240, height = 120;
+    var chartLeft = 38, chartRight = 12, chartTop = 10, chartBottom = 20;
 
     //horizontal spacing between year points
-    var xStep = (width - pad * 2) / (values.length - 1 || 1);
+    var xStep = (width - chartLeft - chartRight) / (values.length - 1 || 1);
+
+    function valueToY(value) {
+        return height - chartBottom - (value / 100) * (height - chartTop - chartBottom);
+    }
 
     //convert each value (0-100%) into SVG x,y coordinates for the line path
     var points = values.map(function (v, i) {
-        var x = pad + i * xStep;
-        var y = height - pad - (v / 100) * (height - pad * 2); // 0–100%
+        var x = chartLeft + i * xStep;
+        var y = valueToY(v); // 0–100%
         return x + "," + y;
     }).join(" ");
 
     //draw visible point markers on each line vertex
     var circles = values.map(function (v, i) {
-        var x = pad + i * xStep;
-        var y = height - pad - (v / 100) * (height - pad * 2);
+        var x = chartLeft + i * xStep;
+        var y = valueToY(v);
         return '<circle cx="' + x + '" cy="' + y + '" r="3" fill="#ff7800"></circle>';
     }).join("");
 
     //draw year labels along the bottom axis
     var labels = years.map(function (yr, i) {
-        var x = pad + i * xStep;
+        var x = chartLeft + i * xStep;
         return '<text x="' + x + '" y="' + (height - 5) + '" font-size="8" text-anchor="middle">' + yr + '</text>';
     }).join("");
 
     //draw y-axis tick marks and labels for percentages
     var yTickValues = [0, 25, 50, 75, 100];
     var yGridLines = yTickValues.map(function (tick) {
-        var y = height - pad - (tick / 100) * (height - pad * 2);
-        return '<line x1="' + pad + '" y1="' + y + '" x2="' + (width - pad) + '" y2="' + y + '" stroke="#ddd" stroke-width="1"/>';
+        var y = valueToY(tick);
+        return '<line x1="' + chartLeft + '" y1="' + y + '" x2="' + (width - chartRight) + '" y2="' + y + '" stroke="#bdbdbd" stroke-width="1" stroke-dasharray="2,2"/>';
     }).join("");
 
     var yTicks = yTickValues.map(function (tick) {
-        var y = height - pad - (tick / 100) * (height - pad * 2);
-        return '<line x1="' + (pad - 4) + '" y1="' + y + '" x2="' + pad + '" y2="' + y + '" stroke="#777"/>' +
-            '<text x="' + (pad - 6) + '" y="' + (y + 3) + '" font-size="8" text-anchor="end">' + tick + '%</text>';
+        var y = valueToY(tick);
+        return '<line x1="' + (chartLeft - 4) + '" y1="' + y + '" x2="' + chartLeft + '" y2="' + y + '" stroke="#666"/>' +
+            '<text x="' + (chartLeft - 7) + '" y="' + (y + 3) + '" font-size="8" text-anchor="end" fill="#333">' + tick + '%</text>';
     }).join("");
 
     //return popup title + chart markup
@@ -77,8 +82,8 @@ function createPopupContent(properties) {
         <h3 style="margin:0 0 6px 0;">${country}</h3>
         <svg width="${width}" height="${height}" viewBox="0 0 ${width} ${height}">
             ${yGridLines}
-            <line x1="${pad}" y1="${height - pad}" x2="${width - pad}" y2="${height - pad}" stroke="#999"/>
-            <line x1="${pad}" y1="${pad}" x2="${pad}" y2="${height - pad}" stroke="#999"/>
+            <line x1="${chartLeft}" y1="${height - chartBottom}" x2="${width - chartRight}" y2="${height - chartBottom}" stroke="#777"/>
+            <line x1="${chartLeft}" y1="${chartTop}" x2="${chartLeft}" y2="${height - chartBottom}" stroke="#777"/>
             ${yTicks}
             <polyline fill="none" stroke="#ff7800" stroke-width="2" points="${points}"></polyline>
             ${circles}
