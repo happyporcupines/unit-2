@@ -1,3 +1,12 @@
+// initialize the map
+var map = L.map('map').setView([39.75621, -104.99404], 12);
+
+// add OpenStreetMap tile layer
+L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom: 19,
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+}).addTo(map);
+
 // adding geoJSON feature
 var geojsonFeature = {
     "type": "Feature",
@@ -79,7 +88,18 @@ var geojsonMarkerOptions = {
     fillOpacity: 0.8
 };
 // adding marker to map
-L.geoJSON(someGeojsonFeature, {
+var markerFeature = {
+    "type": "Feature",
+    "properties": {
+        "name": "Circle Marker Example"
+    },
+    "geometry": {
+        "type": "Point",
+        "coordinates": [-104.98404, 39.74621]
+    }
+};
+
+L.geoJSON(markerFeature, {
     pointToLayer: function (feature, latlng) {
         return L.circleMarker(latlng, geojsonMarkerOptions);
     }
