@@ -35,7 +35,6 @@ var myLines = [{
 }];
 
 //add geojson to map
-L.geoJSON(geojsonFeature).addTo(mymap);
 
 //styles for lines
 var myStyle = {
@@ -102,7 +101,8 @@ var geojsonMarkerOptions = {
 L.geoJSON(geojsonFeature, {
     pointToLayer: function (feature, latlng) {
         return L.circleMarker(latlng, geojsonMarkerOptions);
-    }
+    },
+    onEachFeature: onEachFeature
 }).addTo(mymap);
 
 
@@ -113,10 +113,6 @@ function onEachFeature(feature, layer) {
         layer.bindPopup(feature.properties.popupContent);
     }
 }
-
-L.geoJSON(geojsonFeature, {
-    onEachFeature: onEachFeature
-}).addTo(mymap);
 
 //create some geojson points
 var someFeatures = [{
@@ -140,10 +136,3 @@ var someFeatures = [{
         "coordinates": [-104.98404, 39.74621]
     }
 }];
-
-// //add features and filter to control visibility
-// L.geoJSON(someFeatures, {
-//     filter: function(feature, layer) {
-//         return feature.properties.show_on_map;
-//     }
-// }).addTo(mymap);
