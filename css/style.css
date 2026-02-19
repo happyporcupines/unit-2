@@ -5,8 +5,18 @@ html, body {
     padding: 0;
 }
 
-/* make the map fill its container */
+body {
+    display: flex;
+    flex-direction: column;
+}
+
+h1 {
+    margin: 12px 16px 8px;
+}
+
+/* make the map fill remaining space below header */
 #map {
-    height: 100%;
+    flex: 1;
+    min-height: 0;
     width: 100%;
 }
