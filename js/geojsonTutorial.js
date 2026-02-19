@@ -99,11 +99,10 @@ var geojsonMarkerOptions = {
     fillOpacity: 0.8
 };
 
-var coorsCircleLayer = L.geoJSON(geojsonFeature, {
+L.geoJSON(geojsonFeature, {
     pointToLayer: function (feature, latlng) {
         return L.circleMarker(latlng, geojsonMarkerOptions);
-    },
-    onEachFeature: onEachFeature
+    }
 }).addTo(mymap);
 
 
@@ -115,9 +114,9 @@ function onEachFeature(feature, layer) {
     }
 }
 
-coorsCircleLayer.eachLayer(function (layer) {
-    layer.openPopup();
-});
+L.geoJSON(geojsonFeature, {
+    onEachFeature: onEachFeature
+}).addTo(mymap);
 
 //create some geojson points
 var someFeatures = [{
@@ -142,9 +141,9 @@ var someFeatures = [{
     }
 }];
 
-//add features and filter to control visibility
-L.geoJSON(someFeatures, {
-    filter: function(feature, layer) {
-        return feature.properties.show_on_map;
-    }
-}).addTo(mymap);
+// //add features and filter to control visibility
+// L.geoJSON(someFeatures, {
+//     filter: function(feature, layer) {
+//         return feature.properties.show_on_map;
+//     }
+// }).addTo(mymap);
