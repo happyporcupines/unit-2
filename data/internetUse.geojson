@@ -1,0 +1,20 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    { "type": "Feature", "geometry": { "type": "Point", "coordinates": [-101.538949, 39.751946] }, "properties": { "Country": "United States", "use_1990": 1, "use_1995": 9, "use_2000": 43, "use_2005": 68, "use_2010": 72, "use_2015": 75, "use_2020": 90, "use_2023": 93 } },
+    { "type": "Feature", "geometry": { "type": "Point", "coordinates": [101.173822, 35.776954] }, "properties": { "Country": "China", "use_1990": 0, "use_1995": 0, "use_2000": 2, "use_2005": 9, "use_2010": 34, "use_2015": 50, "use_2020": 70, "use_2023": 91 } },
+    { "type": "Feature", "geometry": { "type": "Point", "coordinates": [79.55185, 22.986382] }, "properties": { "Country": "India", "use_1990": 0, "use_1995": 0, "use_2000": 1, "use_2005": 2, "use_2010": 8, "use_2015": 15, "use_2020": 43, "use_2023": 56 } },
+    { "type": "Feature", "geometry": { "type": "Point", "coordinates": [-103.276205, 55.108512] }, "properties": { "Country": "Canada", "use_1990": 0, "use_1995": 4, "use_2000": 51, "use_2005": 72, "use_2010": 80, "use_2015": 90, "use_2020": 92, "use_2023": 94 } },
+    { "type": "Feature", "geometry": { "type": "Point", "coordinates": [-49.569289, -10.028312] }, "properties": { "Country": "Brazil", "use_1990": 0, "use_1995": 0, "use_2000": 3, "use_2005": 21, "use_2010": 41, "use_2015": 58, "use_2020": 81, "use_2023": 84 } },
+    { "type": "Feature", "geometry": { "type": "Point", "coordinates": [8.21272, 9.2911] }, "properties": { "Country": "Nigeria", "use_1990": 0, "use_1995": 0, "use_2000": 0, "use_2005": 4, "use_2010": 12, "use_2015": 23, "use_2020": 32, "use_2023": 39 } },
+    { "type": "Feature", "geometry": { "type": "Point", "coordinates": [2.564462, 46.41769] }, "properties": { "Country": "France", "use_1990": 0, "use_1995": 2, "use_2000": 14, "use_2005": 43, "use_2010": 77, "use_2015": 78, "use_2020": 85, "use_2023": 87 } },
+    { "type": "Feature", "geometry": { "type": "Point", "coordinates": [134.136549, -24.690778] }, "properties": { "Country": "Australia", "use_1990": 1, "use_1995": 3, "use_2000": 47, "use_2005": 63, "use_2010": 76, "use_2015": 85, "use_2020": 95, "use_2023": 97 } },
+    { "type": "Feature", "geometry": { "type": "Point", "coordinates": [23.984922, -30.300732] }, "properties": { "Country": "South Africa", "use_1990": 0, "use_1995": 1, "use_2000": 5, "use_2005": 7, "use_2010": 24, "use_2015": 52, "use_2020": 72, "use_2023": 76 } },
+    { "type": "Feature", "geometry": { "type": "Point", "coordinates": [-69.895879, -25.577087] }, "properties": { "Country": "Chile", "use_1990": 0, "use_1995": 0, "use_2000": 17, "use_2005": 31, "use_2010": 45, "use_2015": 77, "use_2020": 87, "use_2023": 94 } },
+    { "type": "Feature", "geometry": { "type": "Point", "coordinates": [8.143983, 46.88852] }, "properties": { "Country": "Switzerland", "use_1990": 1, "use_1995": 4, "use_2000": 47, "use_2005": 70, "use_2010": 84, "use_2015": 87, "use_2020": 94, "use_2023": 97 } },
+    { "type": "Feature", "geometry": { "type": "Point", "coordinates": [119.543097, -2.507314] }, "properties": { "Country": "Indonesia", "use_1990": 0, "use_1995": 0, "use_2000": 1, "use_2005": 4, "use_2010": 11, "use_2015": 22, "use_2020": 54, "use_2023": 69 } },
+    { "type": "Feature", "geometry": { "type": "Point", "coordinates": [139.480363, 37.18208] }, "properties": { "Country": "Japan", "use_1990": 0, "use_1995": 2, "use_2000": 30, "use_2005": 67, "use_2010": 78, "use_2015": 91, "use_2020": 90, "use_2023": 87 } },
+    { "type": "Feature", "geometry": { "type": "Point", "coordinates": [30.235272, 49.80275] }, "properties": { "Country": "Ukraine", "use_1990": 0, "use_1995": 0, "use_2000": 1, "use_2005": 4, "use_2010": 23, "use_2015": 49, "use_2020": 75, "use_2023": 82 } },
+    { "type": "Feature", "geometry": { "type": "Point", "coordinates": [-102.901582, 24.15512] }, "properties": { "Country": "Mexico", "use_1990": 0, "use_1995": 0, "use_2000": 5, "use_2005": 17, "use_2010": 31, "use_2015": 57, "use_2020": 71, "use_2023": 81 } }
+  ]
+}
