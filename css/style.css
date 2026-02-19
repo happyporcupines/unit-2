@@ -6,17 +6,18 @@ html, body {
 }
 
 body {
-    display: flex;
-    flex-direction: column;
+    height: 100vh;
 }
 
 h1 {
     margin: 12px 16px 8px;
+    position: relative;
+    z-index: 1000;
+    background: #fff;
 }
 
-/* make the map fill remaining space below header */
+/* keep the map below the header area */
 #map {
-    flex: 1;
-    min-height: 0;
+    height: calc(100vh - 72px);
     width: 100%;
 }
