@@ -33,21 +33,6 @@ function onEachFeature(feature, layer) {
 
 //function to retrieve the data and place it on the map
 function getData(map){
-    //load the data
-    fetch("data/MegaCities.geojson")
-        .then(function(response){
-            return response.json();
-        })
-        .then(function(json){
-            //create a Leaflet GeoJSON layer and add it to the map
-            L.geoJson(json, {
-                onEachFeature: onEachFeature
-            }).addTo(map);
-        })
-};
-
-//function to retrieve the data and place it on the map
-function getData(map){
     fetch("data/MegaCities.geojson")
         .then(function(response){
             return response.json();
@@ -64,6 +49,7 @@ function getData(map){
 
             //create a Leaflet GeoJSON layer and add it to the map
             L.geoJson(json, {
+                onEachFeature: onEachFeature,
                 pointToLayer: function (feature, latlng){
                     return L.circleMarker(latlng, geojsonMarkerOptions);
                 }
