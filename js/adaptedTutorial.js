@@ -1,14 +1,12 @@
 //initialize map variable globally
-var map
-
-/* Map of GeoJSON data from MegaCities.geojson */
-//declare map var in global scope
 var map;
+
 //function to instantiate the Leaflet map
 function createMap(){
+
     //create the map
     map = L.map('map', {
-        center: [20, 0],
+        center: [0, 0],
         zoom: 2
     });
 
@@ -20,7 +18,6 @@ function createMap(){
     //call getData function
     getData(map);
 };
-
 //added at Example 2.3 line 20...function to attach popups to each mapped feature
 function onEachFeature(feature, layer) {
     //no property named popupContent; instead, create html string with all properties
@@ -42,7 +39,20 @@ function getData(map){
             return response.json();
         })
         .then(function(json){
-            //create marker options
+            //create a Leaflet GeoJSON layer and add it to the map
+            L.geoJson(json, {
+                onEachFeature: onEachFeature
+            }).addTo(map);
+        })
+};
+
+//function to retrieve the data and place it on the map
+function getData(map){
+    fetch("data/MegaCities.geojson")
+        .then(function(response){
+            return response.json();
+        })
+        .then(function(json){
             var geojsonMarkerOptions = {
                 radius: 8,
                 fillColor: "#ff7800",
@@ -51,9 +61,9 @@ function getData(map){
                 opacity: 1,
                 fillOpacity: 0.8
             };
+
             //create a Leaflet GeoJSON layer and add it to the map
             L.geoJson(json, {
-                onEachFeature: onEachFeature,
                 pointToLayer: function (feature, latlng){
                     return L.circleMarker(latlng, geojsonMarkerOptions);
                 }
@@ -62,3 +72,4 @@ function getData(map){
 };
 
 document.addEventListener('DOMContentLoaded',createMap)
+
