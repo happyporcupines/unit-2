@@ -10,6 +10,7 @@ var CartoDB_Positron = L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/
 
 //add tile layer to map
 CartoDB_Positron.addTo(mymap);
+// the addTo method is self-explanatory, it adds the layer to the map or layer group
 
 //create geojson feature
 var geojsonFeature = {
@@ -47,6 +48,7 @@ var myStyle = {
 L.geoJSON(myLines, {
     style: myStyle
 }).addTo(mymap);
+// the addTo method is self-explanatory, it adds the layer to the map or layer group
 
 
 //create array of geojson features with party attribute
@@ -87,6 +89,7 @@ L.geoJSON(states, {
         }
     }
 }).addTo(mymap);
+// the addTo method is self-explanatory, it adds the layer to the map or layer group
 
 //add geojson  as circle marker with styles
 var geojsonMarkerOptions = {
@@ -104,13 +107,14 @@ L.geoJSON(geojsonFeature, {
     },
     onEachFeature: onEachFeature
 }).addTo(mymap);
-
+// the addTo method is self-explanatory, it adds the layer to the map or layer group
 
 //attach popup if geojson feature has attribute
 function onEachFeature(feature, layer) {
     // does this feature have a property named popupContent?
     if (feature.properties && feature.properties.popupContent) {
         layer.bindPopup(feature.properties.popupContent);
+        // bindPopup attaches a popup message to a feature
     }
 }
 
