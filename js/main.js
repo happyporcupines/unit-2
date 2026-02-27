@@ -83,7 +83,7 @@ function processData(data){
 
     return attributes;
 }
-
+//function to update the year in the legend
 function updateYearDisplay(attribute){
     var year = attribute.split("_")[1];
     document.querySelector("#selected-year").textContent = year;
