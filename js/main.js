@@ -137,7 +137,7 @@ function updatePropSymbols(attribute){
     updateYearDisplay(attribute);
 
     map.eachLayer(function(layer){
-        if (layer.feature && layer.feature.properties[attribute]){
+        if (layer.feature && layer.feature.properties.hasOwnProperty(attribute)){
             //access feature properties
             var props = layer.feature.properties;
 
