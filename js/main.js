@@ -51,10 +51,27 @@ function calcPropRadius(attValue) {
     return radius;
 };
 
-//function to convert markers to circle markers
-function pointToLayer(feature, latlng){
+function processData(data){
+    //empty array to hold attributes
+    var attributes = [];
+
+    //properties of the first feature in the dataset
+    var properties = data.features[0].properties;
+
+    //push each internet-use attribute name into attributes array
+    for (var attribute in properties){
+        if (attribute.indexOf("use_") === 0){
+            attributes.push(attribute);
+        }
+    }
+
+    return attributes;
+}
+
+//function to convert markers to circle markers and add popups
+function pointToLayer(feature, latlng, attributes){
     //Determine which attribute to visualize with proportional symbols
-    var attribute = "use_2023";
+    var attribute = attributes[0];
 
     //create marker options
     var options = {
@@ -82,16 +99,20 @@ function pointToLayer(feature, latlng){
     popupContent += "<p><b>Internet use in " + year + ":</b> " + feature.properties[attribute] + "%</p>";
 
     //bind the popup to the circle marker
-    layer.bindPopup(popupContent);
+    layer.bindPopup(popupContent, {
+        offset: new L.Point(0, -options.radius)
+    });
 
     //return the circle marker to the L.geoJson pointToLayer option
     return layer;
 };
 
 //Step 3: Add circle markers for point features to the map
-function createPropSymbols(data){
+function createPropSymbols(data, attributes){
     L.geoJson(data, {
-        pointToLayer: pointToLayer
+        pointToLayer: function(feature, latlng){
+            return pointToLayer(feature, latlng, attributes);
+        }
     }).addTo(map);
 };
 
@@ -104,10 +125,11 @@ function getData(){
             return response.json();
         })
         .then(function(json){
+            var attributes = processData(json);
             //calculate minimum data value
             minValue = calcMinValue(json);
             //call function to create proportional symbols
-            createPropSymbols(json);
+            createPropSymbols(json, attributes);
         })
 };
 
