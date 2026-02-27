@@ -116,6 +116,27 @@ function createPropSymbols(data, attributes){
     }).addTo(map);
 };
 
+//Step 1: Create new sequence controls
+function createSequenceControls(attributes){
+    //create range input element (slider)
+    var slider = "<input class='range-slider' type='range'></input>";
+    document.querySelector("#panel").insertAdjacentHTML('beforeend', slider);
+
+    //set slider attributes
+    document.querySelector(".range-slider").max = attributes.length - 1;
+    document.querySelector(".range-slider").min = 0;
+    document.querySelector(".range-slider").value = 0;
+    document.querySelector(".range-slider").step = 1;
+
+    //add step buttons
+    document.querySelector('#panel').insertAdjacentHTML('beforeend','<button class="step" id="reverse"></button>');
+    document.querySelector('#panel').insertAdjacentHTML('beforeend','<button class="step" id="forward"></button>');
+
+    //replace button content with images
+    document.querySelector('#reverse').insertAdjacentHTML('beforeend',"<img src='img/noun-left-arrow.png'>");
+    document.querySelector('#forward').insertAdjacentHTML('beforeend',"<img src='img/noun-right-arrow.png'>");
+};
+
 
 //Step 2: Import GeoJSON data
 function getData(){
@@ -130,6 +151,7 @@ function getData(){
             minValue = calcMinValue(json);
             //call function to create proportional symbols
             createPropSymbols(json, attributes);
+            createSequenceControls(attributes);
         })
 };
 
