@@ -54,24 +54,30 @@ function calcPropRadius(attValue) {
 function processData(data){
     //empty array to hold attributes
     var attributes = [];
+    var attributePrefix = "use_";
 
     //properties of the first feature in the dataset
     var properties = data.features[0].properties;
 
-    //push each internet-use attribute name into attributes array
+    //push each matching attribute name into attributes array
     for (var attribute in properties){
-        if (attribute.indexOf("use_") === 0){
+        if (attribute.indexOf(attributePrefix) > -1){
             attributes.push(attribute);
         }
     }
+
+    //check result
+    console.log(attributes);
 
     return attributes;
 }
 
 //function to convert markers to circle markers and add popups
 function pointToLayer(feature, latlng, attributes){
-    //Determine which attribute to visualize with proportional symbols
+    //Step 4: Assign the current attribute based on the first index of the attributes array
     var attribute = attributes[0];
+    //check
+    console.log(attribute);
 
     //create marker options
     var options = {
@@ -116,6 +122,31 @@ function createPropSymbols(data, attributes){
     }).addTo(map);
 };
 
+//Step 10: Resize proportional symbols according to new attribute values
+function updatePropSymbols(attribute){
+    map.eachLayer(function(layer){
+        if (layer.feature && layer.feature.properties[attribute]){
+            //access feature properties
+            var props = layer.feature.properties;
+
+            //update each feature's radius based on new attribute values
+            var radius = calcPropRadius(props[attribute]);
+            layer.setRadius(radius);
+
+            //build updated popup content
+            var popupContent = "<p><b>Country:</b> " + props.Country + "</p>";
+            var year = attribute.split("_")[1];
+            popupContent += "<p><b>Internet use in " + year + ":</b> " + props[attribute] + "%</p>";
+
+            //update popup with new content and offset
+            var popup = layer.getPopup();
+            popup.setContent(popupContent);
+            popup.options.offset = new L.Point(0, -radius);
+            popup.update();
+        };
+    });
+};
+
 //Step 1: Create new sequence controls
 function createSequenceControls(attributes){
     //create range input element (slider)
@@ -135,6 +166,41 @@ function createSequenceControls(attributes){
     //replace button content with images
     document.querySelector('#reverse').insertAdjacentHTML('beforeend',"<img src='img/noun-left-arrow.png'>");
     document.querySelector('#forward').insertAdjacentHTML('beforeend',"<img src='img/noun-right-arrow.png'>");
+
+    //Step 5: click listener for buttons
+    document.querySelectorAll('.step').forEach(function(step){
+        step.addEventListener("click", function(){
+            var index = Number(document.querySelector('.range-slider').value);
+
+            //Step 6: increment or decrement depending on button clicked
+            if (step.id == 'forward'){
+                index++;
+                //Step 7: if past the last attribute, wrap around to first attribute
+                index = index > attributes.length - 1 ? 0 : index;
+            } else if (step.id == 'reverse'){
+                index--;
+                //Step 7: if past the first attribute, wrap around to last attribute
+                index = index < 0 ? attributes.length - 1 : index;
+            };
+
+            //Step 8: update slider
+            document.querySelector('.range-slider').value = index;
+            console.log(index);
+
+            //Step 9: pass new attribute to update symbols
+            updatePropSymbols(attributes[index]);
+        })
+    })
+
+    //Step 5: input listener for slider
+    document.querySelector('.range-slider').addEventListener('input', function(){
+        //Step 6: get the new index value
+        var index = Number(this.value);
+        console.log(index);
+
+        //Step 9: pass new attribute to update symbols
+        updatePropSymbols(attributes[index]);
+    });
 };
 
 
@@ -146,6 +212,7 @@ function getData(){
             return response.json();
         })
         .then(function(json){
+            //create an attributes array
             var attributes = processData(json);
             //calculate minimum data value
             minValue = calcMinValue(json);
