@@ -1,6 +1,7 @@
 //declare map variable globally so all functions have access
 var map;
 var minValue;
+var symbolsLayer;
 
 //step 1 create map
 function createMap(){
@@ -125,7 +126,7 @@ function pointToLayer(feature, latlng, attributes){
 
 //Step 3: Add circle markers for point features to the map
 function createPropSymbols(data, attributes){
-    L.geoJson(data, {
+    symbolsLayer = L.geoJson(data, {
         pointToLayer: function(feature, latlng){
             return pointToLayer(feature, latlng, attributes);
         }
@@ -136,8 +137,8 @@ function createPropSymbols(data, attributes){
 function updatePropSymbols(attribute){
     updateYearDisplay(attribute);
 
-    map.eachLayer(function(layer){
-        if (layer.feature && layer.feature.properties.hasOwnProperty(attribute)){
+    symbolsLayer.eachLayer(function(layer){
+        if (layer.feature && Object.prototype.hasOwnProperty.call(layer.feature.properties, attribute)){
             //access feature properties
             var props = layer.feature.properties;
 
