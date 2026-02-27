@@ -46,6 +46,12 @@ function calcMinValue(data){
 function calcPropRadius(attValue) {
     //constant factor adjusts symbol sizes evenly
     var minRadius = 5;
+
+    //internetUse has many 0 values; keep them at minimum visible size
+    if (!isFinite(attValue) || attValue <= 0){
+        return minRadius;
+    }
+
     //Flannery Appearance Compensation formula
     var radius = 1.0083 * Math.pow(attValue/minValue,0.5715) * minRadius
 
