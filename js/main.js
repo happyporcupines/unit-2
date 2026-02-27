@@ -77,6 +77,11 @@ function processData(data){
     return attributes;
 }
 
+function updateYearDisplay(attribute){
+    var year = attribute.split("_")[1];
+    document.querySelector("#selected-year").textContent = year;
+}
+
 //function to convert markers to circle markers and add popups
 function pointToLayer(feature, latlng, attributes){
     //Step 4: Assign the current attribute based on the first index of the attributes array
@@ -129,6 +134,8 @@ function createPropSymbols(data, attributes){
 
 //Step 10: Resize proportional symbols according to new attribute values
 function updatePropSymbols(attribute){
+    updateYearDisplay(attribute);
+
     map.eachLayer(function(layer){
         if (layer.feature && layer.feature.properties[attribute]){
             //access feature properties
@@ -171,6 +178,9 @@ function createSequenceControls(attributes){
     //replace button content with images
     document.querySelector('#reverse').insertAdjacentHTML('beforeend',"<img src='img/noun-left-arrow.png'>");
     document.querySelector('#forward').insertAdjacentHTML('beforeend',"<img src='img/noun-right-arrow.png'>");
+
+    //set initial year display
+    updateYearDisplay(attributes[0]);
 
     //Step 5: click listener for buttons
     document.querySelectorAll('.step').forEach(function(step){

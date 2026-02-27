@@ -43,3 +43,8 @@ h1 {
 #reverse {
     float: left;
 }
+
+#year-display {
+    padding: 8px 16px;
+    font-weight: 600;
+}
