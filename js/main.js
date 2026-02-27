@@ -66,6 +66,11 @@ function processData(data){
         }
     }
 
+    //sort attributes chronologically (use_1990, use_1995, ...)
+    attributes.sort(function(a, b){
+        return Number(a.split("_")[1]) - Number(b.split("_")[1]);
+    });
+
     //check result
     console.log(attributes);
 
