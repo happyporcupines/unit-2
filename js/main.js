@@ -229,7 +229,7 @@ function createSequenceControls(attributes){
 //Step 2: Import GeoJSON data
 function getData(){
     //load the data
-    fetch("data/internetUse.geojson")
+    fetch("data/Digital_Country_Data.geojson")
         .then(function(response){
             return response.json();
         })
