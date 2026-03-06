@@ -1,23 +1,62 @@
 //declare map variable globally so all functions have access
 var map;
 var minValue;
-var symbolsLayer;
+var metricLayers = {};
 
 function isDataAttribute(propertyName){
-    return propertyName.indexOf("use_") === 0 || /^\d{4}_I$/.test(propertyName);
+    return /^\d{4}_[IP]$/.test(propertyName);
 }
 
-function getAttributeYear(attribute){
-    if (!attribute){
-        return "";
+function getMetricAttribute(year, metricSuffix){
+    return year + "_" + metricSuffix;
+}
+
+function getYearList(data){
+    var internetYears = [];
+    var phoneYears = [];
+
+    if (!data.features || !data.features.length){
+        return [];
     }
 
-    var yearMatch = String(attribute).match(/\d{4}/);
-    return yearMatch ? yearMatch[0] : attribute;
+    var properties = data.features[0].properties;
+    for (var property in properties){
+        if (/^\d{4}_I$/.test(property)){
+            internetYears.push(property.split("_")[0]);
+        } else if (/^\d{4}_P$/.test(property)){
+            phoneYears.push(property.split("_")[0]);
+        }
+    }
+
+    var phoneYearSet = new Set(phoneYears);
+    var years = Array.from(new Set(internetYears)).filter(function(year){
+        return phoneYearSet.has(year);
+    });
+
+    years.sort(function(a, b){
+        return Number(a) - Number(b);
+    });
+
+    return years;
 }
 
-function getCountryLabel(properties){
-    return properties.Country || properties["Country Name"] || "Unknown";
+function getPopupContent(properties){
+    var fields = [
+        "Use_Maturity",
+        "Culture_and_Norms",
+        "Renowned_For",
+        "Digital_Fun_Fact",
+        "Regional_Pattern"
+    ];
+
+    var popupContent = "<ol>";
+    fields.forEach(function(field){
+        var value = properties[field] || "N/A";
+        popupContent += "<li><b>" + field + ":</b> " + value + "</li>";
+    });
+    popupContent += "</ol>";
+
+    return popupContent;
 }
 
 //step 1 create map
@@ -71,44 +110,22 @@ function calcPropRadius(attValue) {
     return radius;
 };
 
-function processData(data){
-    var attributes = [];
-
-    if (!data.features || !data.features.length){
-        return attributes;
-    }
-
-    var properties = data.features[0].properties;
-
-    for (var attribute in properties){
-        if (isDataAttribute(attribute)){
-            attributes.push(attribute);
-        }
-    }
-
-    attributes.sort(function(a, b){
-        return Number(getAttributeYear(a)) - Number(getAttributeYear(b));
-    });
-
-    return attributes;
-}
-
 //function to update the year in the legend
-function updateYearDisplay(attribute){
-    var year = getAttributeYear(attribute);
+function updateYearDisplay(year){
     document.querySelector("#selected-year").textContent = year;
 }
 
 //function to convert markers to circle markers and add popups
-function pointToLayer(feature, latlng, attributes){
-    var attribute = attributes[0];
+function pointToLayer(feature, latlng, year, metricSuffix){
+    var attribute = getMetricAttribute(year, metricSuffix);
+    var isInternet = metricSuffix === "I";
 
     var options = {
-        fillColor: "#ff7800",
-        color: "#000",
+        fillColor: isInternet ? "#1f78b4" : "#e31a1c",
+        color: isInternet ? "#1f78b4" : "#e31a1c",
         weight: 1,
         opacity: 1,
-        fillOpacity: 0.8
+        fillOpacity: 0.35
     };
 
     var attValue = Number(feature.properties[attribute]);
@@ -116,9 +133,7 @@ function pointToLayer(feature, latlng, attributes){
 
     var layer = L.circleMarker(latlng, options);
 
-    var popupContent = "<p><b>Country:</b> " + getCountryLabel(feature.properties) + "</p>";
-    var year = getAttributeYear(attribute);
-    popupContent += "<p><b>Internet use in " + year + ":</b> " + feature.properties[attribute] + "%</p>";
+    var popupContent = getPopupContent(feature.properties);
 
     layer.bindPopup(popupContent, {
         offset: new L.Point(0, -options.radius)
@@ -128,45 +143,61 @@ function pointToLayer(feature, latlng, attributes){
 };
 
 //Step 3: Add circle markers for point features to the map
-function createPropSymbols(data, attributes){
-    symbolsLayer = L.geoJson(data, {
+function createPropSymbols(data, year){
+    metricLayers.I = L.geoJson(data, {
         filter: function(feature){
             return !!(feature && feature.geometry && feature.geometry.type === "Point");
         },
         pointToLayer: function(feature, latlng){
-            return pointToLayer(feature, latlng, attributes);
+            return pointToLayer(feature, latlng, year, "I");
+        }
+    }).addTo(map);
+
+    metricLayers.P = L.geoJson(data, {
+        filter: function(feature){
+            return !!(feature && feature.geometry && feature.geometry.type === "Point");
+        },
+        pointToLayer: function(feature, latlng){
+            return pointToLayer(feature, latlng, year, "P");
         }
     }).addTo(map);
 };
 
 //Step 10: Resize proportional symbols according to new attribute values
-function updatePropSymbols(attribute){
-    updateYearDisplay(attribute);
+function updatePropSymbols(year){
+    updateYearDisplay(year);
 
-    symbolsLayer.eachLayer(function(layer){
-        if (layer.feature && Object.prototype.hasOwnProperty.call(layer.feature.properties, attribute)){
+    ["I", "P"].forEach(function(metricSuffix){
+        var layerGroup = metricLayers[metricSuffix];
+        var attribute = getMetricAttribute(year, metricSuffix);
+
+        if (!layerGroup){
+            return;
+        }
+
+        layerGroup.eachLayer(function(layer){
+            if (!layer.feature){
+                return;
+            }
+
             var props = layer.feature.properties;
-            var radius = calcPropRadius(props[attribute]);
+            var radius = calcPropRadius(Number(props[attribute]));
             layer.setRadius(radius);
 
-            var popupContent = "<p><b>Country:</b> " + getCountryLabel(props) + "</p>";
-            var year = getAttributeYear(attribute);
-            popupContent += "<p><b>Internet use in " + year + ":</b> " + props[attribute] + "%</p>";
-
             var popup = layer.getPopup();
-            popup.setContent(popupContent);
+            popup.setContent(getPopupContent(props));
             popup.options.offset = new L.Point(0, -radius);
             popup.update();
-        }
+        });
     });
 };
 
 //Step 1: Create new sequence controls
-function createSequenceControls(attributes){
+function createSequenceControls(years){
     var slider = "<input class='range-slider' type='range'></input>";
     document.querySelector("#panel").insertAdjacentHTML('beforeend', slider);
 
-    document.querySelector(".range-slider").max = attributes.length - 1;
+    document.querySelector(".range-slider").max = years.length - 1;
     document.querySelector(".range-slider").min = 0;
     document.querySelector(".range-slider").value = 0;
     document.querySelector(".range-slider").step = 1;
@@ -177,7 +208,7 @@ function createSequenceControls(attributes){
     document.querySelector('#reverse').insertAdjacentHTML('beforeend',"<img src='img/noun-left-arrow.png'>");
     document.querySelector('#forward').insertAdjacentHTML('beforeend',"<img src='img/noun-right-arrow.png'>");
 
-    updateYearDisplay(attributes[0]);
+    updateYearDisplay(years[0]);
 
     document.querySelectorAll('.step').forEach(function(step){
         step.addEventListener("click", function(){
@@ -185,20 +216,20 @@ function createSequenceControls(attributes){
 
             if (step.id == 'forward'){
                 index++;
-                index = index > attributes.length - 1 ? 0 : index;
+                index = index > years.length - 1 ? 0 : index;
             } else if (step.id == 'reverse'){
                 index--;
-                index = index < 0 ? attributes.length - 1 : index;
+                index = index < 0 ? years.length - 1 : index;
             }
 
             document.querySelector('.range-slider').value = index;
-            updatePropSymbols(attributes[index]);
+            updatePropSymbols(years[index]);
         })
     })
 
     document.querySelector('.range-slider').addEventListener('input', function(){
         var index = Number(this.value);
-        updatePropSymbols(attributes[index]);
+        updatePropSymbols(years[index]);
     });
 };
 
@@ -212,15 +243,15 @@ function getData(){
             return response.json();
         })
         .then(function(json){
-            var attributes = processData(json);
+            var years = getYearList(json);
 
-            if (!attributes.length){
+            if (!years.length){
                 throw new Error("No time-series attributes found in Digital_Country_Data.geojson");
             }
 
             minValue = calcMinValue(json);
-            createPropSymbols(json, attributes);
-            createSequenceControls(attributes);
+            createPropSymbols(json, years[0]);
+            createSequenceControls(years);
         })
         .catch(function(error){
             console.error("Error loading proportional symbol data:", error);
