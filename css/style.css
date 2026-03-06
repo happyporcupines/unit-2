@@ -1,50 +1,335 @@
+/* Reset margins/padding and set background color */
 html, body {
     margin: 0;
     padding: 0;
+    background-color: lavender;
 }
 
+/* Center body content and set max width */
+body {
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+/* Main heading styling */
 h1 {
     margin: 0;
     padding: 12px 16px;
-    background: #fff;
+    background: lavender;
+    font-family: 'Bitcount Prop Double Ink', sans-serif;
 }
 
+/* Subheading styling */
+h3 {
+    font-family: 'Bitcount Prop Double Ink', sans-serif;
+}
+
+/* Main layout container for map and legend using grid */
+#map-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 280px;
+    align-items: start;
+    column-gap: 14px;
+    padding: 0 14px;
+}
+
+/* Leaflet map container */
 #map {
     height: 520px;
-    width: 80%;
-    display: inline-block;
-}
-
-#panel {
-    width: 25%;
-    padding: 20px;
-    display: inline-block;
-    vertical-align: top;
-    text-align: center;
-    line-height: 42px;
-}
-/*the styling for the slider and the buttons in the legend*/
-.range-slider {
-    width: 55%;
-}
-
-.step {
-    width: 20%;
-}
-
-.step img {
     width: 100%;
+    display: block;
 }
 
-#forward {
-    float: right;
+/* Right-side legend box for marker size information */
+#size-legend {
+    width: 260px;
+    padding: 12px 12px 14px;
+    margin-top: 0;
+    margin-right: 14px;
+    background: rgba(255, 255, 255, 0.85);
+    border: 1px solid #bbb;
+    border-radius: 4px;
+    max-height: 500px;
+    overflow-y: auto;
 }
 
-#reverse {
-    float: left;
+/* Container for filter controls */
+#filter-controls {
+    margin-bottom: 14px;
 }
 
+/* Title text for filter sections */
+.filter-title {
+    margin: 0 0 8px;
+    font-size: 21px;
+    font-family: 'Bitcount Prop Double Ink', sans-serif;
+}
+
+/* Container box for filter options */
+.filter-box {
+    border: 1px solid #bbb;
+    border-radius: 4px;
+    padding: 8px;
+    background: rgba(255, 255, 255, 0.95);
+}
+
+/* Individual filter option with checkbox and label */
+.filter-option {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    margin-bottom: 8px;
+    font-family: 'Bitcount Prop Double Ink', sans-serif;
+    font-size: 14px;
+    line-height: 1.2;
+    cursor: pointer;
+}
+
+/* Remove margin from last filter option */
+.filter-option:last-child {
+    margin-bottom: 0;
+}
+
+/* Checkbox input styling */
+.filter-option input {
+    margin-top: 2px;
+}
+
+/* Heading for the size legend section */
+#size-legend h4 {
+    margin: 0 0 10px;
+    font-size: 21px;
+    font-family: 'Bitcount Prop Double Ink', sans-serif;
+}
+
+/* Individual legend item with symbol and label */
+.size-legend-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+
+/* Remove margin from last legend item */
+.size-legend-item:last-child {
+    margin-bottom: 0;
+}
+
+/* Wrapper container for legend symbol to align circles */
+.size-legend-symbol-wrap {
+    width: 90px;
+    height: 90px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-shrink: 0;
+    margin-right: 8px;
+    overflow: hidden;
+}
+
+/* Circle symbols in legend */
+.size-legend-circle {
+    display: block;
+    border: 1px solid #1f78b4;
+    background: rgba(31, 120, 180, 0.12);
+    border-radius: 50%;
+    box-sizing: border-box;
+}
+
+/* Small solid circle for zero/very small values */
+.size-legend-zero {
+    display: block;
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: #1f78b4;
+}
+
+/* Text label next to legend symbols */
+.size-legend-label {
+    font-size: 18px;
+    line-height: 1.2;
+    font-family: 'Bitcount Prop Double Ink', sans-serif;
+    flex-shrink: 0;
+}
+
+/* Main panel container for content below the map */
+#panel {
+    width: auto;
+    margin: 10px 14px 0;
+    padding: 0;
+    display: block;
+    text-align: left;
+    line-height: normal;
+}
+
+/* Container for the slider and navigation buttons */
+.slider-controls-row {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    flex-wrap: wrap;
+}
+
+/* Sub-container for main slider controls */
+.slider-main-controls {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* The range/year slider input */
+.range-slider {
+    width: 260px;
+}
+
+/* Navigation button (previous/next) for slider */
+.step {
+    width: 64px;
+    height: 34px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    overflow: hidden;
+    border: 2px solid #4a0080;
+    background: #6a1b9a;
+    border-radius: 4px;
+}
+
+/* Arrow icon inside step button */
+.step img {
+    width: 70%;
+    height: 70%;
+    max-width: 24px;
+    max-height: 24px;
+    object-fit: contain;
+    display: block;
+    filter: brightness(0) invert(1);
+}
+
+/* Text label next to the slider */
+.slider-note {
+    margin: 0;
+    font-size: 26px;
+    line-height: 1.1;
+    font-family: 'Bitcount Prop Double Ink', sans-serif;
+}
+
+/* Large text displaying the current year */
 #year-display {
-    padding: 8px 16px;
+    padding: 12px 14px;
     font-weight: 600;
+    font-size: 30px;
+    font-family: 'Bitcount Prop Double Ink', sans-serif;
 }
+
+/* Container for year information and controls */
+#year-info-row {
+    margin: 6px 14px 0;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+/* Container for legend hint about dashed circle borders */
+#dashed-border-hint {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    max-width: 820px;
+}
+
+/* Example circle with dashed border for visual reference */
+.dashed-example-circle {
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    border: 5px dashed #1f78b4;
+    background: rgba(31, 120, 180, 0.12);
+    box-sizing: border-box;
+    flex-shrink: 0;
+}
+
+/* Text explanation next to dashed circle example */
+#dashed-border-hint p {
+    margin: 0;
+    font-size: 26px;
+    line-height: 1.15;
+    font-family: 'Bitcount Prop Double Ink', sans-serif;
+}
+
+/* Outer container for multi-page popups */
+.popup-container {
+    font-family: 'Bitcount Prop Double Ink', sans-serif;
+    min-width: 280px;
+}
+
+/* Individual page of popup content */
+.popup-page {
+    padding: 4px 0;
+}
+
+/* Heading inside popup page */
+.popup-page h3 {
+    margin: 0 0 12px 0;
+    font-size: 28px;
+    line-height: 1.1;
+    font-family: 'Bitcount Prop Double Ink', sans-serif;
+}
+
+/* Paragraph text inside popup page */
+.popup-page p {
+    margin: 8px 0;
+    font-size: 22px;
+    line-height: 1.2;
+    font-family: 'Bitcount Prop Double Ink', sans-serif;
+}
+
+/* Container for popup navigation buttons */
+.popup-controls {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    margin-top: 12px;
+    padding-top: 8px;
+    border-top: 1px solid #ddd;
+}
+
+/* Previous/next navigation buttons */
+.popup-prev,
+.popup-next {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 4px 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Hover effect for navigation buttons */
+.popup-prev:hover,
+.popup-next:hover {
+    opacity: 0.7;
+}
+
+/* Arrow icons inside prev/next buttons */
+.popup-prev img,
+.popup-next img {
+    width: 24px;
+    height: 24px;
+    display: block;
+}
+
+/* Page counter text (e.g., "1 of 3") */
+.popup-page-indicator {
+    font-family: 'Bitcount Prop Double Ink', sans-serif;
+    font-size: 20px;
+    min-width: 64px;
+    text-align: center;
+}
+
+/* Star icon styling */

@@ -3,9 +3,12 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width">
-    <title></title>
+    <title>Global Mobile and Internet Use</title>
 
     <!--put your external stylesheet links here-->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bitcount+Prop+Double+Ink:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="lib/leaflet/leaflet.css" />
     <link rel="stylesheet" href="css/style.css" />
 
@@ -18,11 +21,20 @@
 </head>
 
 <body>
-<h1>Percentage of Population who Uses Internet</h1>
-<div id="map"></div>
+<h1>Global Mobile and Internet Use</h1>
+<div id="map-layout">
+    <div id="map"></div>
+    <aside id="size-legend" aria-label="Circle size legend"></aside>
+</div>
 <!--the panel for the legend-->
 <div id="panel"></div>
-<div id="year-display">Selected Year: <span id="selected-year"></span></div>
+<div id="year-info-row">
+    <div id="year-display">Selected Year: <span id="selected-year"></span></div>
+    <div id="dashed-border-hint" aria-label="Dashed border meaning">
+        <span class="dashed-example-circle" aria-hidden="true"></span>
+        <p>Click on any circle on the map to see more information. Circles with a dashed border have fun facts.<br> Fun facts may differ from current map data since they represent World Bank Data from 2026.</p>
+    </div>
+</div>
 <h3>Internet data from worldbank.org ; Map data from <a href = "https://www.openstreetmap.org/">OpenStreetMaps</a></h3>
 <!--put your external script links here-->
 <script type="text/javascript" src="lib/leaflet/leaflet-src.js"></script>
