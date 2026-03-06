@@ -3,6 +3,23 @@ var map;
 var minValue;
 var symbolsLayer;
 
+function isDataAttribute(propertyName){
+    return propertyName.indexOf("use_") === 0 || /^\d{4}_I$/.test(propertyName);
+}
+
+function getAttributeYear(attribute){
+    if (!attribute){
+        return "";
+    }
+
+    var yearMatch = String(attribute).match(/\d{4}/);
+    return yearMatch ? yearMatch[0] : attribute;
+}
+
+function getCountryLabel(properties){
+    return properties.Country || properties["Country Name"] || "Unknown";
+}
+
 //step 1 create map
 function createMap(){
 
@@ -22,81 +39,70 @@ function createMap(){
 };
 
 function calcMinValue(data){
-    //create empty array to store all data values
     var allValues = [];
-    //loop through each city
-    for(var city of data.features){
-        //loop through each internet-use attribute
-        for(var property in city.properties){
-            if(property.indexOf("use_") === 0){
+
+    for (var city of data.features){
+        for (var property in city.properties){
+            if (isDataAttribute(property)){
                 var value = Number(city.properties[property]);
-                if(value > 0){
+                if (value > 0){
                     allValues.push(value);
                 }
             }
         }
     }
-    //get minimum non-zero value of our array
-    var minValue = Math.min(...allValues)
 
-    return minValue;
+    if (!allValues.length){
+        return 1;
+    }
+
+    return Math.min(...allValues);
 }
 
 //calculate the radius of each proportional symbol
 function calcPropRadius(attValue) {
-    //constant factor adjusts symbol sizes evenly
     var minRadius = 5;
 
-    //internetUse has many 0 values; keep them at minimum visible size
     if (!isFinite(attValue) || attValue <= 0){
         return minRadius;
     }
 
-    //Flannery Appearance Compensation formula
-    var radius = 1.0083 * Math.pow(attValue/minValue,0.5715) * minRadius
-
+    var radius = 1.0083 * Math.pow(attValue / minValue, 0.5715) * minRadius;
     return radius;
 };
 
 function processData(data){
-    //empty array to hold attributes
     var attributes = [];
-    var attributePrefix = "use_";
 
-    //properties of the first feature in the dataset
+    if (!data.features || !data.features.length){
+        return attributes;
+    }
+
     var properties = data.features[0].properties;
 
-    //push each matching attribute name into attributes array
     for (var attribute in properties){
-        if (attribute.indexOf(attributePrefix) > -1){
+        if (isDataAttribute(attribute)){
             attributes.push(attribute);
         }
     }
 
-    //sort attributes chronologically (use_1990, use_1995, ...)
     attributes.sort(function(a, b){
-        return Number(a.split("_")[1]) - Number(b.split("_")[1]);
+        return Number(getAttributeYear(a)) - Number(getAttributeYear(b));
     });
-
-    //check result
-    console.log(attributes);
 
     return attributes;
 }
+
 //function to update the year in the legend
 function updateYearDisplay(attribute){
-    var year = attribute.split("_")[1];
+    var year = getAttributeYear(attribute);
     document.querySelector("#selected-year").textContent = year;
 }
 
 //function to convert markers to circle markers and add popups
 function pointToLayer(feature, latlng, attributes){
-    //Step 4: Assign the current attribute based on the first index of the attributes array
     var attribute = attributes[0];
-    //check
-    console.log(attribute);
 
-    //create marker options
     var options = {
         fillColor: "#ff7800",
         color: "#000",
@@ -105,34 +111,28 @@ function pointToLayer(feature, latlng, attributes){
         fillOpacity: 0.8
     };
 
-    //For each feature, determine its value for the selected attribute
     var attValue = Number(feature.properties[attribute]);
-
-    //Give each feature's circle marker a radius based on its attribute value
     options.radius = calcPropRadius(attValue);
 
-    //create circle marker layer
     var layer = L.circleMarker(latlng, options);
 
-    //build popup content string starting with country
-    var popupContent = "<p><b>Country:</b> " + feature.properties.Country + "</p>";
-
-    //add formatted attribute to popup content string
-    var year = attribute.split("_")[1];
+    var popupContent = "<p><b>Country:</b> " + getCountryLabel(feature.properties) + "</p>";
+    var year = getAttributeYear(attribute);
     popupContent += "<p><b>Internet use in " + year + ":</b> " + feature.properties[attribute] + "%</p>";
 
-    //bind the popup to the circle marker
     layer.bindPopup(popupContent, {
         offset: new L.Point(0, -options.radius)
     });
 
-    //return the circle marker to the L.geoJson pointToLayer option
     return layer;
 };
 
 //Step 3: Add circle markers for point features to the map
 function createPropSymbols(data, attributes){
     symbolsLayer = L.geoJson(data, {
+        filter: function(feature){
+            return !!(feature && feature.geometry && feature.geometry.type === "Point");
+        },
         pointToLayer: function(feature, latlng){
             return pointToLayer(feature, latlng, attributes);
         }
@@ -145,103 +145,86 @@ function updatePropSymbols(attribute){
 
     symbolsLayer.eachLayer(function(layer){
         if (layer.feature && Object.prototype.hasOwnProperty.call(layer.feature.properties, attribute)){
-            //access feature properties
             var props = layer.feature.properties;
-
-            //update each feature's radius based on new attribute values
             var radius = calcPropRadius(props[attribute]);
             layer.setRadius(radius);
 
-            //build updated popup content
-            var popupContent = "<p><b>Country:</b> " + props.Country + "</p>";
-            var year = attribute.split("_")[1];
+            var popupContent = "<p><b>Country:</b> " + getCountryLabel(props) + "</p>";
+            var year = getAttributeYear(attribute);
             popupContent += "<p><b>Internet use in " + year + ":</b> " + props[attribute] + "%</p>";
 
-            //update popup with new content and offset
             var popup = layer.getPopup();
             popup.setContent(popupContent);
             popup.options.offset = new L.Point(0, -radius);
             popup.update();
-        };
+        }
     });
 };
 
 //Step 1: Create new sequence controls
 function createSequenceControls(attributes){
-    //create range input element (slider)
     var slider = "<input class='range-slider' type='range'></input>";
     document.querySelector("#panel").insertAdjacentHTML('beforeend', slider);
 
-    //set slider attributes
     document.querySelector(".range-slider").max = attributes.length - 1;
     document.querySelector(".range-slider").min = 0;
     document.querySelector(".range-slider").value = 0;
     document.querySelector(".range-slider").step = 1;
 
-    //add step buttons
     document.querySelector('#panel').insertAdjacentHTML('beforeend','<button class="step" id="reverse"></button>');
     document.querySelector('#panel').insertAdjacentHTML('beforeend','<button class="step" id="forward"></button>');
 
-    //replace button content with images
     document.querySelector('#reverse').insertAdjacentHTML('beforeend',"<img src='img/noun-left-arrow.png'>");
     document.querySelector('#forward').insertAdjacentHTML('beforeend',"<img src='img/noun-right-arrow.png'>");
 
-    //set initial year display
     updateYearDisplay(attributes[0]);
 
-    //Step 5: click listener for buttons
     document.querySelectorAll('.step').forEach(function(step){
         step.addEventListener("click", function(){
             var index = Number(document.querySelector('.range-slider').value);
 
-            //Step 6: increment or decrement depending on button clicked
             if (step.id == 'forward'){
                 index++;
-                //Step 7: if past the last attribute, wrap around to first attribute
                 index = index > attributes.length - 1 ? 0 : index;
             } else if (step.id == 'reverse'){
                 index--;
-                //Step 7: if past the first attribute, wrap around to last attribute
                 index = index < 0 ? attributes.length - 1 : index;
-            };
+            }
 
-            //Step 8: update slider
             document.querySelector('.range-slider').value = index;
-            console.log(index);
-
-            //Step 9: pass new attribute to update symbols
             updatePropSymbols(attributes[index]);
         })
     })
 
-    //Step 5: input listener for slider
     document.querySelector('.range-slider').addEventListener('input', function(){
-        //Step 6: get the new index value
         var index = Number(this.value);
-        console.log(index);
-
-        //Step 9: pass new attribute to update symbols
         updatePropSymbols(attributes[index]);
     });
 };
 
-
 //Step 2: Import GeoJSON data
 function getData(){
-    //load the data
     fetch("data/Digital_Country_Data.geojson")
         .then(function(response){
+            if (!response.ok){
+                throw new Error("HTTP " + response.status + " loading Digital_Country_Data.geojson");
+            }
             return response.json();
         })
         .then(function(json){
-            //create an attributes array
             var attributes = processData(json);
-            //calculate minimum data value
+
+            if (!attributes.length){
+                throw new Error("No time-series attributes found in Digital_Country_Data.geojson");
+            }
+
             minValue = calcMinValue(json);
-            //call function to create proportional symbols
             createPropSymbols(json, attributes);
             createSequenceControls(attributes);
         })
+        .catch(function(error){
+            console.error("Error loading proportional symbol data:", error);
+        });
 };
 
 document.addEventListener('DOMContentLoaded',createMap)
